@@ -1,0 +1,97 @@
+[
+    {
+        "key": "email",
+        "label": "E-mail",
+        "type": "email",
+        "rules": [
+            {
+                "type": "regex",
+                "condition": "/^[a-zA-Z_0-9]+\\@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$/",
+                "error": "Helytelen e-mail cím"
+            },
+            {
+                "type": "check_email",
+                "field": "email",
+                "condition": "equal",
+                "error": "Az e-mail cím már létezik"
+            }
+        ]
+    },
+    {
+        "key": "first_name",
+        "label": "Keresztnév",
+        "rules": [
+            {
+                "type": "min",
+                "condition": 2
+            },
+            {
+                "type": "max",
+                "condition": 50
+            }
+        ]
+    },
+    {
+        "key": "last_name",
+        "label": "Vezetéknév",
+        "rules": [
+            {
+                "type": "min",
+                "condition": 2
+            },
+            {
+                "type": "max",
+                "condition": 50
+            }
+        ]
+    },
+    {
+        "key": "password",
+        "label": "Jelszó",
+        "type": "password",
+        "rules": [
+            {
+                "type": "compare_equal",
+                "condition": "password_repeat"
+            }
+        ]
+    },
+    {
+        "key": "password_repeat",
+        "label": "Jelszó ismétlése",
+        "type": "password"
+    },
+    {
+        "key": "phone",
+        "label": "Telefonszám",
+        "rules": [
+            {
+                "type": "regex",
+                "condition": "/^[0-9]+$/",
+                "error": "Helytelen formátum"
+            }
+        ]
+    },
+    {
+        "key": "address",
+        "label": "Utca",
+        "rules": [
+            {
+                "type": "regex",
+                "condition": "/^[a-zA-ZíÍáÁéÉúÚűŰóÓöÖ]+\\,?\\s?[a-zA-ZíÍáÁéÉúÚűŰóÓöÖ0-9]+$/",
+                "error": "Helytelen formátum"
+            }
+        ]
+    },
+    {
+        "key": "number",
+        "label": "Házszám",
+        "rules": [
+            {
+                "type": "regex",
+                "condition": "/^[0-9]+$/",
+                "error": "Helytelen formátum"
+            }
+        ]
+    }
+]

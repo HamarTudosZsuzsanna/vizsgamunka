@@ -1,0 +1,31 @@
+[
+    {
+        "key": "email",
+        "label": "E-mail",
+        "rules": [
+            {
+                "type": "regex",
+                "condition": "/^[a-zA-Z_0-9]+\\@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+$/",
+                "error": "Helytelen e-mail cím"
+            },
+            {
+                "type": "check_email",
+                "field": "email",
+                "condition": "not_equal",
+                "error": "Az e-mail cím nem létezik"
+            }
+        ]
+    },
+    {
+        "key": "password",
+        "label": "Jelszó",
+        "type": "password",
+        "rules": [
+            {
+                "type": "verify_password",
+                "field": "password",
+                "error": "Helytelen jelszó"
+            }
+        ]
+    }
+]
