@@ -47,43 +47,6 @@ trait MetaData
         return $string;
     }
 
-    /*public function createMetaArticle(array $columnsValues, int $userId)
-    {
-        // Ellenőrizzük, hogy a szükséges mezők rendelkezésre állnak
-        if (empty($columnsValues['title']) || empty($columnsValues['text'])) {
-            error_log('A cím és a cikk szövege kötelező.');
-            return false;
-        }
-
-        // Lekérdezés előkészítése új rekord beszúrásához
-        $queryString = "INSERT INTO users_articles (title, text, slug, user_id) VALUES (:title, :text, :slug, :user_id)";
-
-        // Paraméterek előkészítése
-        $params = [
-            ':title' => $columnsValues['title'],
-            ':text' => $columnsValues['text'],
-            ':slug' => $this->slugify($columnsValues['title']),
-            ':user_id' => $userId
-        ];
-
-        // Lekérdezés előkészítése
-        $stmt = $this->connection->prepare($queryString);
-
-        // Paraméterek bindelése
-        foreach ($params as $param => $value) {
-            $stmt->bindValue($param, $value, PDO::PARAM_STR);
-        }
-
-        // Lekérdezés végrehajtása
-        if (!$stmt->execute()) {
-            error_log("SQL Error: " . implode(", ", $stmt->errorInfo()));
-            return false;
-        }
-
-        return true;
-    }
-*/
-
     protected function readMeta(array $columns = ['*'],  array $conditions = [], $tableName)
     {
         $columnNames = implode(',', $columns);

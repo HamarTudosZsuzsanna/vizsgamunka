@@ -9,10 +9,17 @@ class User extends Model
     protected string $tableName = 'users';
 
     protected array $fillables = [
+        'id',
         'email',
         'first_name',
         'last_name',
         'password',
+    ];
+
+    protected array $fillablesData = [
+        'phone',
+        'address',
+        'number',
     ];
 
     protected array $casts = [
@@ -36,10 +43,41 @@ class User extends Model
         return parent::update($data, $conditions);
     }
 
+    public function updateUserData(array $data, string $userId): bool
+    {
+
+        $queryString = "UPDATE users_meta SET phone = :phone, address = :address, number = :number WHERE user_id = :user_id";
+
+        $params = [
+            ':phone' => $data['phone'],
+            ':address' => $data['address'],
+            ':number' => $data['number'],
+            ':user_id' => $userId
+        ];
+
+        $stmt = $this->connection->prepare($queryString);
+
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value, PDO::PARAM_STR);
+        }
+
+        if (!$stmt->execute()) {
+            error_log("SQL Error: " . implode(", ", $stmt->errorInfo()));
+            return false;
+        }
+
+        return true;
+    }
+
 
     public function getByEmail(string $email, array $columns = ['id'])
     {
         return $this->filterGuarded($this->read($columns, ['email' => $email]));
+    }
+
+    public function getByUserId($userId)
+    {
+        return $this->readMeta(['*'], ['user_id' => $userId], 'users_meta');
     }
 
     public function verifyPassword(string $email, string $password)
@@ -68,6 +106,17 @@ class User extends Model
     {
         foreach ($data as $key => $value) {
             if (!in_array($key, $this->fillables)) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
+    }
+
+    public function filterFillablesData(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $this->fillablesData)) {
                 unset($data[$key]);
             }
         }

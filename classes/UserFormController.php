@@ -44,7 +44,6 @@ class UserFormController extends FormController
         if (array_key_exists('password_repeat', $data)) {
             unset($data['password_repeat']);
         }
-
         
         $userData = requestFilter(['id', 'email', 'first_name', 'last_name', 'password'], $data);
         $user = new User();
@@ -54,15 +53,39 @@ class UserFormController extends FormController
             return false;
         }
 
-
         $updatedData = $user->getByEmail($userData['email'], ['*']);
         $_SESSION['logged_in'] = $updatedData;
 
-        if (!empty($userMetaData = requestFilter(['address', 'phone', 'number'], $data))) {
-            $user->createMeta($userMetaData, $userData['id']);
+        redirect('/profile');
+    }
+
+    public static function updateData(array $data, array $definitions)
+    {
+        $errors = parent::validate($data, $definitions);
+
+        if (!empty($errors)) {
+            return $errors;
         }
 
-        redirect('/profile/update');
+        if ($errors === false) {
+            return;
+        }
+
+        $userId = $_SESSION['logged_in']['id'];
+        $userMetaData = requestFilter(['phone', 'address', 'number'], $data);
+        $user = new User();
+        
+        $result = $user->updateUserData($userMetaData, $userId);
+
+        if (!$result) {
+            return false;
+        }
+
+        $updatedData = $user->getByUserId($userId);
+
+        //$_SESSION['logged_in'] = $updatedData;
+
+        redirect('/profile');
     }
 
 

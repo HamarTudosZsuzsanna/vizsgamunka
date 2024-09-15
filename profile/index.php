@@ -5,79 +5,122 @@ session_start();
 $errors = [];
 $user = new User();
 $definitions = FormController::getDefinition('userUpdate');
+$definitionDatas = FormController::getDefinition('userData');
 
 if (!empty($_POST)) {
-    $errors = UserFormController::update(array_merge($_POST, $_FILES), $definitions);
+
+    if (isset($_POST['form_type']) && $_POST['form_type'] === 'user') {
+        $errors = UserFormController::update(array_merge($_POST, $_FILES), $definitions);
+    } elseif (isset($_POST['form_type']) && $_POST['form_type'] === 'user_data') {
+        $errors = UserFormController::updateData(array_merge($_POST, $_FILES), $definitionDatas);
+    }
 }
 
-if (!empty($_POST) && array_key_exists('logout', $_POST) && !empty($_POST['logout'])) {
-    $user = new User();
-    $user->logout();
-}
-
-if (empty($_SESSION['logged_in'])) {
+if (empty($_SESSION['logged_in']['id'])) {
     redirect('/login');
 }
 
-
 $userId = $_SESSION['logged_in']['id'];
 $loggedUser = $user->filterFillables($_SESSION['logged_in']);
+$userData = $user->getByUserId($userId);
+$loggedUserData = $user->filterFillablesData($userData);
 
-$keyMapData = ['phone' => 'E-mail cím', 'address' => 'Létrehozási idő', 'number' => 'number'];
-//dd($loggedUser);
+
+//pd($loggedUser);
+//pd($userData);
+//pd($loggedUserData);
 ?>
+
 <!DOCTYPE html>
 
 <head>
     <meta charset="UTF-8">
 </head>
 
-<body style="display: flex; flex-wrap: wrap; gap: 15px; max-width: 800px;">
-    
-    <?php foreach ($definitions as $definition) : //alapadatok
-        if (!array_key_exists($definition['key'], $loggedUser) && $definition['force_show'] !== true) {
+<body style="display: flex; flex-wrap: wrap; gap: 15px;">
+
+    <!-- Alapadatok megjelenítése -->
+    <?php foreach ($definitions as $definition) :
+        if (!array_key_exists($definition['key'], $loggedUser) && (!isset($definition['force_show']) || $definition['force_show'] !== true)) {
             continue;
         }
     ?>
         <div style="display: flex; flex-direction: column;">
-            <label><?php echo $definition['label']; ?></label>
-            <div><?php echo $loggedUser[$definition['key']] ?? ''; ?></div>
+            <label><?php echo htmlspecialchars($definition['label'], ENT_QUOTES, 'UTF-8'); ?></label>
+            <div><?php echo htmlspecialchars($loggedUser[$definition['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
         </div>
     <?php endforeach; ?>
 
-    <form method="POST" enctype="multipart/form-data">
-        <?php foreach ($definitions as $definition) : // szerkesztés
-            if (!array_key_exists($definition['key'], $loggedUser) && $definition['force_show'] !== true) {
+    <!-- Szállítási adatok megjelenítése -->
+    <?php foreach ($definitionDatas as $definitionData) : ?>
+            <div style="display: flex; flex-direction: column;">
+                <div><?php echo htmlspecialchars($definitionData['label'], ENT_QUOTES, 'UTF-8'); ?></div>
+                <div><?php echo htmlspecialchars($loggedUserData[$definitionData['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
+            </div>
+        <?php endforeach; ?>
+
+    <!-- Űrlap szerkesztése -->
+
+    <form method="POST">
+        <h3>Alapadatok szerkesztése</h3>
+        <input type="hidden" name="form_type" value="user" />
+        <input type="hidden" name="id" value="<?php echo htmlspecialchars($loggedUser['id'], ENT_QUOTES, 'UTF-8'); ?>" />
+        <?php foreach ($definitions as $definition) :
+            if (!array_key_exists($definition['key'], $loggedUser) && (!isset($definition['force_show']) || $definition['force_show'] !== true)) {
                 continue;
             }
         ?>
             <div style="display: flex; flex-direction: column;">
-                <label><?php echo $definition['label']; ?></label>
+                <label><?php echo htmlspecialchars($definition['label'], ENT_QUOTES, 'UTF-8'); ?></label>
                 <input
-                    type="<?php echo $definition['type'] ?? 'text'; ?>"
-                    name="<?php echo $definition['key']; ?>"
-                    value="<?php echo $loggedUser[$definition['key']] ?? ''; ?>" />
-                <?php if (is_array($errors) && array_key_exists($definition['key'], $errors) && !empty($errors[$definition['key']])): ?>
-                    <div style="color: red;"><?php echo $errors[$definition['key']]; ?></div>
+                    type="<?php echo htmlspecialchars($definition['type'] ?? 'text', ENT_QUOTES, 'UTF-8'); ?>"
+                    name="<?php echo htmlspecialchars($definition['key'], ENT_QUOTES, 'UTF-8'); ?>"
+                    value="<?php echo htmlspecialchars($loggedUser[$definition['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
+                <?php if (isset($errors[$definition['key']]) && !empty($errors[$definition['key']])): ?>
+                    <div style="color: red;"><?php echo htmlspecialchars($errors[$definition['key']], ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
 
-
-
-        <?php if (is_array($errors) && array_key_exists('form_errors', $errors)): ?>
-            <div style="color: red;"><?php echo $errors['form_errors']; ?></div>
+        <!-- Általános űrlaphiba megjelenítése -->
+        <?php if (isset($errors['form_errors'])): ?>
+            <div style="color: red;"><?php echo htmlspecialchars($errors['form_errors'], ENT_QUOTES, 'UTF-8'); ?></div>
         <?php endif; ?>
 
         <div>
             <input type="submit" value="Módosítás" />
             <a style="background-color: red; color: white; padding: 2px 5px; border-radius:3px;" href="/">Vissza a főoldalra</a>
         </div>
-        <form method="POST" style="flex: 1 0 100%;">
-            <input type="hidden" name="logout" value="true" />
-            <input type="submit" value="Kijelentkezés" />
-        </form>
     </form>
+
+    <!-- Szállítási cím szerkesztése -->
+    <form method="POST">
+        <h3>Szállítási cím szerkesztése</h3>
+        <input type="hidden" name="form_type" value="user_data" />
+        <?php foreach ($definitionDatas as $definitionData) : ?>
+            <div style="display: flex; flex-direction: column;">
+                <label><?php echo htmlspecialchars($definitionData['label'], ENT_QUOTES, 'UTF-8'); ?></label>
+                <input
+                    type="<?php echo htmlspecialchars($definitionData['type'] ?? 'text', ENT_QUOTES, 'UTF-8'); ?>"
+                    name="<?php echo htmlspecialchars($definitionData['key'], ENT_QUOTES, 'UTF-8'); ?>"
+                    value="<?php echo htmlspecialchars($loggedUserData[$definitionData['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?>" />
+                <?php if (isset($errors[$definitionData['key']]) && !empty($errors[$definitionData['key']])): ?>
+                    <div style="color: red;"><?php echo htmlspecialchars($errors[$definitionData['key']], ENT_QUOTES, 'UTF-8'); ?></div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+
+        <!-- Általános űrlaphiba megjelenítése -->
+        <?php if (isset($errors['form_errors'])): ?>
+            <div style="color: red;"><?php echo htmlspecialchars($errors['form_errors'], ENT_QUOTES, 'UTF-8'); ?></div>
+        <?php endif; ?>
+
+        <div>
+            <input type="submit" value="Módosítás" />
+            <a style="background-color: red; color: white; padding: 2px 5px; border-radius:3px;" href="/">Vissza a főoldalra</a>
+        </div>
+    </form>
+
 </body>
 
 </html>
