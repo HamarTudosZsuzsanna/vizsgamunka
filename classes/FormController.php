@@ -10,7 +10,8 @@ class FormController {
         self::$definitionName = $name;
         return json_decode(file_get_contents($path), true);
     }
-    
+ 
+   
     public static function getFieldValue(string|int $key): string|int {
         if (empty(self::$formData) && !array_key_exists($key, self::$formData)) {
             return '';

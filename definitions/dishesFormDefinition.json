@@ -1,0 +1,72 @@
+[
+    {
+        "key": "dishes_name",
+        "label": "Termék neve",
+        "rules": [
+            {
+                "type": "min",
+                "condition": "2"
+            },
+            {
+                "type": "max",
+                "condition": "20"
+            }
+        ]
+    },
+    {
+        "key": "description",
+        "label": "Termék leírás",
+        "rules": [
+            {
+                "type": "min",
+                "condition": 2
+            },
+            {
+                "type": "max",
+                "condition": 50
+            }
+        ]
+    },
+    {
+        "key": "price",
+        "label": "Termék ára",
+        "rules": [
+            {
+                "type": "min",
+                "condition": 2
+            },
+            {
+                "type": "max",
+                "condition": 10
+            }
+        ]
+    },
+    {
+        "key": "dishes_image",
+        "label": "Termék képe",
+        "rules": [
+            {
+                "type": "min",
+                "condition": 2
+            },
+            {
+                "type": "max",
+                "condition": 80
+            }
+        ]
+    },
+    {
+        "key": "categories",
+        "label": "Termékkategória",
+        "rules": [
+            {
+                "type": "min",
+                "condition": 2
+            },
+            {
+                "type": "max",
+                "condition": 10
+            }
+        ]
+    }
+]

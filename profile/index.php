@@ -16,6 +16,11 @@ if (!empty($_POST)) {
     }
 }
 
+if (!empty($_POST) && array_key_exists('logout', $_POST) && !empty($_POST['logout'])) {
+    $user = new User;
+    $user->logout();
+}
+
 if (empty($_SESSION['logged_in']['id'])) {
     redirect('/login');
 }
@@ -38,27 +43,32 @@ $loggedUserData = $user->filterFillablesData($userData);
 </head>
 
 <body style="display: flex; flex-wrap: wrap; gap: 15px;">
-
-    <!-- Alapadatok megjelenítése -->
-    <?php foreach ($definitions as $definition) :
-        if (!array_key_exists($definition['key'], $loggedUser) && (!isset($definition['force_show']) || $definition['force_show'] !== true)) {
-            continue;
-        }
-    ?>
-        <div style="display: flex; flex-direction: column;">
-            <label><?php echo htmlspecialchars($definition['label'], ENT_QUOTES, 'UTF-8'); ?></label>
-            <div><?php echo htmlspecialchars($loggedUser[$definition['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
-        </div>
-    <?php endforeach; ?>
-
-    <!-- Szállítási adatok megjelenítése -->
-    <?php foreach ($definitionDatas as $definitionData) : ?>
+    <div style="display: flex; flex-direction: column; gap: 15px; width: 250px; margin-left:20px">
+        <!-- Alapadatok megjelenítése -->
+        <h3>Alapadatok</h3>
+        <?php foreach ($definitions as $definition) :
+            if (!array_key_exists($definition['key'], $loggedUser) && (!isset($definition['force_show']) || $definition['force_show'] !== true)) {
+                continue;
+            }
+        ?>
             <div style="display: flex; flex-direction: column;">
-                <div><?php echo htmlspecialchars($definitionData['label'], ENT_QUOTES, 'UTF-8'); ?></div>
-                <div><?php echo htmlspecialchars($loggedUserData[$definitionData['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
+                <label style="font-weight: bold"><?php echo htmlspecialchars($definition['label'], ENT_QUOTES, 'UTF-8'); ?></label>
+                <div><?php echo htmlspecialchars($loggedUser[$definition['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
             </div>
         <?php endforeach; ?>
 
+        <!-- Szállítási adatok megjelenítése -->
+        <?php foreach ($definitionDatas as $definitionData) : ?>
+            <div style="display: flex; flex-direction: column;">
+                <div style="font-weight: bold"><?php echo htmlspecialchars($definitionData['label'], ENT_QUOTES, 'UTF-8'); ?></div>
+                <div><?php echo htmlspecialchars($loggedUserData[$definitionData['key']] ?? '', ENT_QUOTES, 'UTF-8'); ?></div>
+            </div>
+        <?php endforeach; ?>
+        <form method="POST">
+            <input type="hidden" name="logout" value="true">
+            <input type="submit" value="Kijelentkezés">
+        </form>
+    </div>
     <!-- Űrlap szerkesztése -->
 
     <form method="POST">
@@ -70,7 +80,7 @@ $loggedUserData = $user->filterFillablesData($userData);
                 continue;
             }
         ?>
-            <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 <label><?php echo htmlspecialchars($definition['label'], ENT_QUOTES, 'UTF-8'); ?></label>
                 <input
                     type="<?php echo htmlspecialchars($definition['type'] ?? 'text', ENT_QUOTES, 'UTF-8'); ?>"
@@ -98,7 +108,7 @@ $loggedUserData = $user->filterFillablesData($userData);
         <h3>Szállítási cím szerkesztése</h3>
         <input type="hidden" name="form_type" value="user_data" />
         <?php foreach ($definitionDatas as $definitionData) : ?>
-            <div style="display: flex; flex-direction: column;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
                 <label><?php echo htmlspecialchars($definitionData['label'], ENT_QUOTES, 'UTF-8'); ?></label>
                 <input
                     type="<?php echo htmlspecialchars($definitionData['type'] ?? 'text', ENT_QUOTES, 'UTF-8'); ?>"
