@@ -1,8 +1,10 @@
 <?php
 require_once('Model.php');
+require_once(TRAITS_DIR . '/MetaData.php');
 
 class Dishes extends Model
 {
+    use MetaData;
 
     protected string $tableName = 'dishes';
 
@@ -70,4 +72,26 @@ class Dishes extends Model
     }
 
 
+    public function getDishesImage(int|null $userId)
+    {
+        if (empty($userId)) {
+            return '';
+        }
+
+        $result = $this->readMeta(['*'], ['admin_id' => $userId, 'dishes_image' => 'dishes_image'], 'dishes');
+
+        /*if (empty($result) || !array_key_exists('meta_value', $result)) {
+            return '';
+        }*/
+
+        return $result['dishes_image'];
+    }
+
+    public function getDishesById()
+    {
+
+        $result = $this->readMeta(['*'], [], 'dishes');
+
+        return $result;
+    }
 }

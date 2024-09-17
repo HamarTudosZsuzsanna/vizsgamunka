@@ -9,4 +9,5 @@ define('ORDERS_DIR', dirname(dirname(__FILE__)) . '/orders');
 define('PROFILE_DIR', dirname(dirname(__FILE__)) . '/profile');
 define('REGISTER_DIR', dirname(dirname(__FILE__)) . '/register');
 define('TRAITS_DIR', dirname(dirname(__FILE__)) . '/traits');
+define('PUBLIC_DISHES_DIR', dirname(dirname(__FILE__)) . '/public/dishes');
 require(INCLUDES_DIR . '/helpers.php');

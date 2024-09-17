@@ -44,6 +44,7 @@
     {
         "key": "dishes_image",
         "label": "Termék képe",
+        "type": "file",
         "rules": [
             {
                 "type": "min",

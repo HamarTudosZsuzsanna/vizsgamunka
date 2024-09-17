@@ -125,21 +125,5 @@ class User extends Model
     }
 
 
-   /* public function getProfileImage(int|null $userId)
-    {
-        if (empty($userId)) {
-            return '';
-        }
-
-        $result = $this->readMeta(['*'], ['user_id' => $userId, 'meta_key' => 'profile_img'], 'users_meta');
-
-        if (empty($result) || !array_key_exists('meta_value', $result)) {
-            return '';
-        }
-
-        return $result['meta_value'];
-    }
-        */
-
 
 }
