@@ -16,20 +16,22 @@ class Dishes extends Model
         'dishes_image',
         'admin_id',
         'categories',
+        'slug',
     ];
 
     public function createDishes(array $columnsValues, int $adminId)
     {
 
-        $queryString = "INSERT INTO {$this->tableName} (dishes_name, description, price, dishes_image, admin_id, categories)
-                    VALUES (:dishes_name, :description, :price, :dishes_image, :admin_id, :categories)
+        $queryString = "INSERT INTO {$this->tableName} (dishes_name, description, price, dishes_image, admin_id, categories, slug)
+                    VALUES (:dishes_name, :description, :price, :dishes_image, :admin_id, :categories, :slug)
                     ON DUPLICATE KEY UPDATE 
                         dishes_name = VALUES(dishes_name), 
                         description = VALUES(description), 
                         price = VALUES(price),
                         dishes_image = VALUES(dishes_image);
                         admin_id = VALUES(admin_id);
-                        categories = VALUES(categories);";
+                        categories = VALUES(categories);
+                        slug = VALUES(slug);";
 
         $stmt = $this->connection->prepare($queryString);
 
@@ -39,7 +41,8 @@ class Dishes extends Model
             ':description' => $columnsValues['description'],
             ':price' => $columnsValues['price'],
             ':dishes_image' => $columnsValues['dishes_image'],
-            ':categories' => $columnsValues['categories']
+            ':categories' => $columnsValues['categories'],
+            ':slug' => $columnsValues['slug']
         ];
 
         foreach ($params as $param => $value) {
@@ -54,10 +57,38 @@ class Dishes extends Model
         return true;
     }
 
-    public function updateDishes(array $data, array $conditions): string|false
+    public function updateDishes(array $data, string $dishesSlug): bool
     {
-        $data = parent::castValues($data);
-        return parent::update($data, $conditions);
+        $errors = [];
+
+        if (!isset($_SESSION['logged_in']['id']) || !is_numeric($_SESSION['logged_in']['id']) || (int)$_SESSION['logged_in']['id'] <= 0) {
+            $errors['form_errors'] = 'Hibás felhasználói azonosító.';
+            return $errors;
+        }
+
+        $queryString = "UPDATE dishes SET dishes_name = :dishes_name, description = :description, price = :price, dishes_image = :dishes_image, categories = :categories WHERE slug = :slug";
+
+        $params = [
+            ':dishes_name' => $data['dishes_name'],
+            ':description' => $data['description'],
+            ':price' => $data['price'],
+            ':dishes_image' => $data['dishes_image'],
+            ':categories' => $data['categories'],
+            ':slug' => $dishesSlug
+        ];
+
+        $stmt = $this->connection->prepare($queryString);
+
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value, PDO::PARAM_STR);
+        }
+
+        if (!$stmt->execute()) {
+            error_log("SQL Error: " . implode(", ", $stmt->errorInfo()));
+            return false;
+        }
+
+        return true;
     }
 
     public function filterFillablesDishes(array $data)
@@ -72,13 +103,13 @@ class Dishes extends Model
     }
 
 
-    public function getDishesImage(int|null $userId)
+    public function getDishesImage(int|null $dishesImage)
     {
-        if (empty($userId)) {
+        if (empty($dishesImage)) {
             return '';
         }
 
-        $result = $this->readMeta(['*'], ['admin_id' => $userId, 'dishes_image' => 'dishes_image'], 'dishes');
+        $result = $this->readMeta(['*'], ['dishes_image' => $dishesImage], 'dishes');
 
         /*if (empty($result) || !array_key_exists('meta_value', $result)) {
             return '';
@@ -93,5 +124,28 @@ class Dishes extends Model
         $result = $this->readMeta(['*'], [], 'dishes');
 
         return $result;
+    }
+
+    public function getDishesBySlug($dishesSlug)
+    {
+
+        $result = $this->readMeta(['*'], ['slug' => $dishesSlug], 'dishes');
+
+        return $result;
+    }
+
+    public function getDishesImageBySlug($dishesSlug)
+    {
+
+        $result = $this->readMeta(['dishes_image'], ['slug' => $dishesSlug], 'dishes');
+
+        return $result;
+    }
+
+    public function deleteDishes($dishesId) {
+        $conditions = [
+            'id' => $dishesId
+        ];
+        return $this -> delete($conditions);
     }
 }

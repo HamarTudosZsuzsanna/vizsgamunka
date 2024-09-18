@@ -39,31 +39,34 @@ class FormController {
 
     private static function validateFormData(array|null $definitions): array {
         $errors = [];
-
+    
         try {
             if ($definitions === null) {
                 throw new Exception('Json cannot be decoded!');
             }
-
+    
             foreach (self::$formData as $key => $fieldData) {
                 foreach ($definitions as $definition) {
                     if ($definition['key'] === $key && array_key_exists('rules', $definition)) {
                         foreach ($definition['rules'] as $rule) {
                             $isError = false;
-
+    
+                            // Ellenőrizd, hogy a mező string-e, mielőtt a strlen() függvényt hívnád
+                            $isStringField = is_string($fieldData);
+    
                             switch($rule['type']) {
                                 case 'regex':
-                                    if (!preg_match($rule['condition'], $fieldData)) {
+                                    if ($isStringField && !preg_match($rule['condition'], $fieldData)) {
                                         $isError = true;
                                     }
                                 break;
                                 case 'min':
-                                    if (strlen($fieldData) < $rule['condition']) {
+                                    if ($isStringField && strlen($fieldData) < $rule['condition']) {
                                         $isError = true;
                                     }
                                 break;
                                 case 'max':
-                                    if (strlen($fieldData) > $rule['condition']) {
+                                    if ($isStringField && strlen($fieldData) > $rule['condition']) {
                                         $isError = true;
                                     }
                                 break;
@@ -92,7 +95,7 @@ class FormController {
                                     }
                                 break;
                             }
-
+    
                             if ($isError) {
                                 if (array_key_exists('error', $rule)) {
                                     $errors[$key] = $rule['error'];
@@ -112,7 +115,7 @@ class FormController {
     
         return $errors;
     }
-
+    
     public static function sanitizeData(string|int|array $data) {
         if (!is_string($data)) {
             return $data;
