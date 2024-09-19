@@ -44,7 +44,7 @@ class UserFormController extends FormController
         if (array_key_exists('password_repeat', $data)) {
             unset($data['password_repeat']);
         }
-        
+
         $userData = requestFilter(['id', 'email', 'first_name', 'last_name', 'password'], $data);
         $user = new User();
         $result = $user->update($userData, ['id' => $userData['id']]);
@@ -74,7 +74,7 @@ class UserFormController extends FormController
         $userId = $_SESSION['logged_in']['id'];
         $userMetaData = requestFilter(['phone', 'address', 'number'], $data);
         $user = new User();
-        
+
         $result = $user->updateUserData($userMetaData, $userId);
 
         if (!$result) {
@@ -109,5 +109,32 @@ class UserFormController extends FormController
         }
     }
 
+    public static function loginAdmin($data, $definitions)
+{
+    $errors = parent::validate($data, $definitions);
+
+    if (!empty($errors)) {
+        return $errors;
+    }
+
+    if ($errors === false) {
+        return;
+    }
+
+    $user = new User();
+    $user = $user->getByEmail($data['email'], ['*']);
+
+    if (!empty($user)) {
+        if ($user['role'] === 'admin') {
+            $_SESSION['logged_in'] = $user;
+        } else {
+            $errors['form_errors'] = 'Nincs admin jogosultságod'; // Külön hibaüzenet hozzáadása
+            return $errors;
+        }
+    } else {
+        $errors['email'] = 'A felhasználó nem található!';
+        return $errors;
+    }
+}
 
 }

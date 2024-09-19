@@ -8,20 +8,19 @@ $errors = [];
 $dishes = new Dishes();
 $definitions = FormController::getDefinition('dishes');
 
-if (empty($_SESSION['logged_in'])) {
+if (empty($_SESSION['logged_in']) || $_SESSION['logged_in']['role'] !== 'admin') {
     redirect('/login');
 }
 
 $userId = $_SESSION['logged_in']['id'];
 $loggedUser = $dishes->filterFillablesDishes($_SESSION['logged_in']);
 
-pd($dishes);
-pd($loggedUser['dishes_image']);
-
 
 if (!empty($_POST)) {
     $errors = DishesFormController::saveDishes($_POST, $definitions);
 }
+
+
 ?>
 
 

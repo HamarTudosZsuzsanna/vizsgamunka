@@ -13,11 +13,11 @@ class FormController {
  
    
     public static function getFieldValue(string|int $key): string|int {
-        if (empty(self::$formData) && !array_key_exists($key, self::$formData)) {
-            return '';
+        if (isset(self::$formData[$key])) {
+            return self::$formData[$key];
         }
-    
-        return self::$formData[$key];
+
+        return '';
     }
     
     public static function validate(array $data, array|null $definitions): array|false {
@@ -92,6 +92,14 @@ class FormController {
                                         if (!$user->verifyPassword(self::$formData['email'], self::$formData['password'])) {
                                             $isError = true;
                                         }
+                                    }
+                                break;
+                                case 'check_role':
+                                    $user = new User();
+                                    $userData = $user->getByEmail(self::$formData['email'], ['role']);
+
+                                    if (empty($userData) || $userData['role'] !== $rule['condition']) {
+                                        $isError = true;
                                     }
                                 break;
                             }

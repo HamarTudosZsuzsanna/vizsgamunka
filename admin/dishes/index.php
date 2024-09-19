@@ -8,8 +8,7 @@ session_start();
 $definitionDishes = FormController::getDefinition('dishes');
 $user = new User();
 $dishes = new Dishes();
-
-//pd($dishes);
+$dishesId = []; 
 
 
 if (!empty($_POST) && array_key_exists('logout', $_POST) && !empty($_POST['logout'])) {
@@ -17,13 +16,13 @@ if (!empty($_POST) && array_key_exists('logout', $_POST) && !empty($_POST['logou
     $user->logout();
 }
 
-if (empty($_SESSION['logged_in']['id'])) {
+if (empty($_SESSION['logged_in']) || $_SESSION['logged_in']['role'] !== 'admin') {
     redirect('/login');
 }
 
 $userId = $_SESSION['logged_in']['id'];
-//$loggedUser = $user->filterFillables($_SESSION['logged_in']);
 $dishesData = $dishes->getDishesById();
+pd($dishesData);
 
 if (isset($_SESSION['logged_in']['id']) && is_numeric($_SESSION['logged_in']['id'])) {
     $userId = (int)$_SESSION['logged_in']['id'];
@@ -73,11 +72,13 @@ if (isset($_SESSION['logged_in']['id']) && is_numeric($_SESSION['logged_in']['id
                     <?php else: ?>
                         <div><strong>Kép:</strong> Nincs kép</div>
                     <?php endif; ?>
+
                     <form action="" method="POST" onsubmit="return confirmDelete()">
                         <button><a href="/admin/dishes/update/?id=<?php echo urlencode($dish['slug']); ?>">Termék szerkesztése</a></button>
                         <input type="hidden" name="dishes_id" value="<?php echo htmlspecialchars($dish['id']) ?>" />
                         <input type="submit" name="delete" value="Termék törlése" />
                     </form>
+
                 </div>
 
             <?php endforeach; ?>

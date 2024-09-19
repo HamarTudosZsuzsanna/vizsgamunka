@@ -12,6 +12,7 @@ if (!empty($_SESSION['logged_in'])) {
     redirect('/profile');
 }
 
+
 ?>
 <!DOCTYPE html>
     <head>

@@ -11,8 +11,7 @@ $errors = [];
 $dishes = new Dishes();
 $definitions = FormController::getDefinition('dishes');
 
-// Ha nincs bejelentkezve a felhasználó, irányítsuk át a login oldalra
-if (empty($_SESSION['logged_in']['id'])) {
+if (empty($_SESSION['logged_in']) || $_SESSION['logged_in']['role'] !== 'admin') {
     redirect('/login');
 }
 
@@ -22,7 +21,7 @@ $dishesData = $dishes->getDishesBySlug($dishesSlug);  // Lekérjük a slug alapj
 $dishesImage = $dishes->getDishesImageBySlug($dishesSlug);
 
 $errors = DishesFormController::updateDishes(array_merge($_POST, $_FILES), $definitions);
-pd($dishesImage);
+pd($dishesData)
 ?>
 
 <!DOCTYPE html>
@@ -45,15 +44,21 @@ pd($dishesImage);
                 <?php if ($definition['type'] != 'file') : ?>
                     <!-- Alap mezők kezelése, mint pl. szöveg, szám -->
                     <input
-                        type="<?php echo htmlspecialchars($definition['type']); ?>"
+                        type="<?php echo htmlspecialchars($definition['type'] ?? 'text'); ?>"
                         id="<?php echo htmlspecialchars($definition['key']); ?>"
                         name="<?php echo htmlspecialchars($definition['key']); ?>"
                         value="<?php echo htmlspecialchars($dishesData[$definition['key']] ?? ''); ?>"
                         required />
                 <?php else : ?>
                     <!-- Kép megjelenítése és fájlfeltöltés -->
-                    <img src="<?php echo $dishesImage;?>" alt="<?php echo htmlspecialchars($dishesData['dishes_image']); ?>" style="width:100px;height:100px;" />
-                    <input type="file" name="dishes_image" />
+                    <?php if (!empty($dishesData[$definition['key']])) : ?>
+                        <img src="<?php echo htmlspecialchars($dishesData[$definition['key']]); ?>" alt="Kép" style="max-width: 100px;" />
+                        <!-- Eltároljuk a jelenlegi kép URL-jét, hogy új feltöltés hiányában ezt használjuk -->
+                        <input type="hidden" name="current_image" value="<?php echo htmlspecialchars($dishesData[$definition['key']]); ?>" />
+                    <?php else : ?>
+                        <p>Nincs feltöltött kép</p>
+                    <?php endif; ?>
+                    <input type="file" name="<?php echo htmlspecialchars($definition['key']); ?>" />
                 <?php endif; ?>
 
                 <!-- Hibaüzenetek megjelenítése -->
