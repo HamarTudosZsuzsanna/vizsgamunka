@@ -91,6 +91,17 @@ class Dishes extends Model
         return true;
     }
 
+    public function getDishNameById($dishId)
+    {
+        $query = "SELECT dishes_name FROM dishes WHERE id = :dish_id";
+        $stmt = $this->connection->prepare($query);
+        $stmt->bindValue(':dish_id', $dishId, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result ? $result['dishes_name'] : 'Ismeretlen termék';
+    }
+
     public function filterFillablesDishes(array $data)
     {
         foreach ($data as $key => $value) {

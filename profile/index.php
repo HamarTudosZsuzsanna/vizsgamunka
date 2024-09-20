@@ -1,9 +1,12 @@
 <?php
 require('../includes/init.php');
 require('../classes/UserFormController.php');
+require('../classes/OrdersController.php');
+require('../models/Orders.php');
 session_start();
 $errors = [];
 $user = new User();
+$order = new Orders();
 $definitions = FormController::getDefinition('userUpdate');
 $definitionDatas = FormController::getDefinition('userData');
 
@@ -18,6 +21,7 @@ if (!empty($_POST)) {
 
 if (!empty($_POST) && array_key_exists('logout', $_POST) && !empty($_POST['logout'])) {
     $user = new User;
+    $order = new Orders;
     $user->logout();
 }
 
@@ -28,12 +32,15 @@ if (empty($_SESSION['logged_in']['id'])) {
 $userId = $_SESSION['logged_in']['id'];
 $loggedUser = $user->filterFillables($_SESSION['logged_in']);
 $userData = $user->getByUserId($userId);
+$userDataOrders = $user->getByUserOrder($userId);
 $loggedUserData = $user->filterFillablesData($userData);
+$loggedUserOrders = $order->filterFillablesOrders($userDataOrders);
 
 
 //pd($loggedUser);
 //pd($userData);
 //pd($loggedUserData);
+//pd($userDataOrders);
 ?>
 
 <!DOCTYPE html>
@@ -119,6 +126,33 @@ $loggedUserData = $user->filterFillablesData($userData);
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+
+        <!-- Rendelések megjelenítése -->
+        <h3>Eddigi rendelések</h3>
+        
+            <table>
+            <thead>
+                <tr>
+                    <th>Rendelés ID</th>
+                    <th>Étel ID</th>
+                    <th>Mennyiség</th>
+                    <th>Ár</th>
+                    <th>Dátum</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($userDataOrders as $order) : ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($order['order_id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($order['dish_id'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($order['quantity'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($order['price'], ENT_QUOTES, 'UTF-8'); ?> Ft</td>
+                        <td><?php echo htmlspecialchars($order['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
 
         <!-- Általános űrlaphiba megjelenítése -->
         <?php if (isset($errors['form_errors'])): ?>

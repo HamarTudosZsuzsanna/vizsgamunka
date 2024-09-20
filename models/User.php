@@ -80,6 +80,16 @@ class User extends Model
         return $this->readMeta(['*'], ['user_id' => $userId], 'users_meta');
     }
 
+    public function getByUserOrder($userId)
+    {
+        return $this->readMeta(['*'], ['user_id' => $userId], 'orders');
+    }
+
+    public function getByUserOrderCart($userId)
+    {
+        return $this->readMeta(['*'], ['cart_user_id' => $userId], 'cart_item');
+    }
+
     public function verifyPassword(string $email, string $password)
     {
         $user = $this->read(['password'], ['email' => $email]);
