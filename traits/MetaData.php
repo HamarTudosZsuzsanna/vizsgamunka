@@ -47,7 +47,7 @@ trait MetaData
         return $string;
     }
 
-    protected function readMeta(array $columns = ['*'],  array $conditions = [], $tableName)
+    protected function readMeta(array $columns = ['*'], array $conditions = [], $tableName)
     {
         $columnNames = implode(',', $columns);
         $conditionString = '';
@@ -56,14 +56,10 @@ trait MetaData
             $conditionString = $this->assembleConditions($conditions);
         }
 
-        $stmt = $this->connection->prepare("select $columnNames from $tableName $conditionString");
+        $stmt = $this->connection->prepare("SELECT $columnNames FROM $tableName $conditionString");
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (count($result) === 1) {
-            $result = reset($result);
-        }
-
-        return $result;
+        return $result; // Mindig tömböt ad vissza
     }
 }
