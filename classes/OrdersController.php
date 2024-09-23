@@ -24,12 +24,9 @@ class OrdersController extends FormController
         
 
         $ordersData = [
-            'id' => $data['dishes_name'],
+            'id' => $order_id,
             'user_id' => $userId,
-            'order_id' => $order_id,
-            'dish_id' => $data['dish_id'],
-            'quantity' => isset($data['quantity']) ? $data['quantity'] : null,
-            'price' => $data['price'],
+            'total_price' => $data['total_price'],
         ];
 
         

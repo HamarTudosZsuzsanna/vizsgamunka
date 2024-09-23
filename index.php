@@ -28,7 +28,7 @@ $dishesData = $dishes->getDishesById();
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <link href="/assets/css/main.css" rel="stylesheet">
     <style>
-        .title{
+        .title {
             font-size: 36px;
         }
     </style>
@@ -118,6 +118,17 @@ $dishesData = $dishes->getDishesById();
             </div>
         </div>
     </div>
+
+    <section class="text-center py-5" id="gallery">
+        <h2 class="fw-bold">Lorem Ipsum</h2>
+        <?php foreach ($dishesData as $dish) : ?>
+            <div class="d-flex row-cols-2 g-2 pt-4">
+                <div class="col">
+                    <img src="<?php echo htmlspecialchars($dish['dishes_image'], ENT_QUOTES, 'UTF-8'); ?>" class="img-fluid" alt="" style="width: 200px; heigth: 200px;">
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </section>
 
 </body>
 

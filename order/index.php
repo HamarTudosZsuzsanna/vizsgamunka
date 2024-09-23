@@ -23,16 +23,35 @@ $userDataCart = $user->getByUserOrderCart($userId);
 
 $totalPrice = 0;
 
+if (empty($userDataCart)) {
+    echo "";
+} else {
 
+    if (!is_array($userDataCart[0])) {
+        $userDataCart = [$userDataCart];
+    }
+
+    foreach ($userDataCart as $order) {
+        if (isset($order['cart_quantity'], $order['cart_price'])) {
+            $calculatedPrice = $order['cart_quantity'] * $order['cart_price'];
+            $totalPrice += $calculatedPrice;
+        }
+    }
+}
 
 $dishesData = $dishes->getDishesById();
 
 //pd($dishesData);
-//pd($userDataCart);
+pd($userDataCart);
 
 if (!empty($_POST)) {
     $errors = CartController::addToCart($_POST, $definitionDishes);
 }
+
+/*if (!empty($_POST) && isset($_POST['createOrder'])) {
+
+    $errors = OrdersController::saveOrders($_POST, $definitionDishes);
+}*/
 
 if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
     $cartItemId = (int)$_POST['id'];
@@ -41,6 +60,7 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
     redirect('/order');
     exit;
 }
+
 
 
 ?>
@@ -71,6 +91,11 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+        }
+
+        .product-img {
+            width: 250px;
+            height: 250px;
         }
     </style>
 </head>
@@ -128,21 +153,12 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                                     <div class="body d-flex flex-row justify-content-around fw-bold align-items-center p-2">
                                         <p class="text m-0">Termék</p>
                                         <p class="text m-0">Mennyiség</p>
+                                        <p class="text m-0">Egységár</p>
                                         <p class="text m-0">Ár</p>
                                         <p class="text m-0">Törlés</p>
                                     </div>
                                 </div>
                                 <?php
-                                if (is_array($userDataCart) && count($userDataCart) > 0) {
-                                    foreach ($userDataCart as $order) {
-                                        if (isset($order['cart_quantity'], $order['cart_price'])) {
-                                            $calculatedPrice = $order['cart_quantity'] * $order['cart_price'];
-                                            $totalPrice += $calculatedPrice; // Összesített ár kiszámítása
-                                        } else {
-                                            echo "Hiba: A rendelés nem megfelelően formázott.";
-                                        }
-                                    }
-                                };
                                 foreach ($userDataCart as $order) :
                                     $calculatedPrice = $order['cart_quantity'] * $order['cart_price'];
                                 ?>
@@ -171,18 +187,26 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Bezárás</button>
-                                <button type="button" class="btn btn-dark">Megrendelés</button>
+                                <form action="" method="POST" class="cart-form">
+                                    <input type="hidden" name="cart_product_id" value="<?php echo $dish['id']; ?>" />
+                                    <input type="hidden" name="cart_user_id" value="<?php echo $userId; ?>" />
+                                    <input type="hidden" name="cart_quantity" value="<?php echo $userId; ?>" />
+                                    <input type="hidden" name="total_price" value="<?php echo htmlspecialchars($calculatedPrice, ENT_QUOTES, 'UTF-8'); ?>" />
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-dark mt-2" name="createOrder" type="submit">Megrendelés</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-around p-2 m-1">
+            <div class="d-flex justify-content-around p-2 m-2 flex-wrap"> 
                 <?php foreach ($dishesData as $dish) : ?>
-                    <div class="card" style="width: 18rem;">
+                    <div class="card m-2" style="width: 18rem;">
                         <?php if (!empty($dish['dishes_image'])): ?>
-                            <img src="<?php echo htmlspecialchars($dish['dishes_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="Dishes Image" class="card-img-top p-4"><br>
+                            <img src="<?php echo htmlspecialchars($dish['dishes_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="Dishes Image" class="card-img-top p-4 product-img"><br>
                         <?php else: ?>
                             <strong>Kép:</strong> Nincs kép<br>
                         <?php endif; ?>
@@ -206,8 +230,6 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                 <?php endforeach; ?>
             </div>
         </div>
-
-
 
     </div>
 

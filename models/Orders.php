@@ -11,36 +11,38 @@ class Orders extends Model
     protected array $fillablesOrders = [
         'id',
         'user_id',
-        'order_id',
-        'dish_id',
-        'quantity',
-        'price',
+        'total_price',
     ];
 
     public function createOrders(array $columnsValues, int $userId)
     {
-
-        $queryString = "INSERT INTO {$this->tableName} (user_id, order_id, dish_id, quantity, price)
-                    VALUES (:user_id, :order_id, :dish_id, :quantity, :price)
+        $queryString = "INSERT INTO {$this->tableName} (user_id, total_price)
+                    VALUES (:user_id, :total_price)
                     ON DUPLICATE KEY UPDATE 
                         user_id = :user_id,
-                        order_id = :order_id,
-                        dish_id = :dish_id,
-                        quantity = :quantity,
-                        price = :price;";
+                        total_price = :total_price;
+                        ";
 
         $stmt = $this->connection->prepare($queryString);
 
         $params = [
             ':user_id' => $userId,
-            ':order_id' => $columnsValues['order_id'],
-            ':dish_id' => $columnsValues['dish_id'],
-            ':quantity' => $columnsValues['quantity'],
-            ':price' => $columnsValues['price']
+            ':total_price' => $columnsValues['total_price'],
         ];
 
-        foreach ($params as $param => $value) {
-            $stmt->bindValue($param, $value, PDO::PARAM_STR);
+        // Bind parameters with the correct type
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+
+        // Check if total_price is numeric and bind appropriately
+        if (is_numeric($columnsValues['total_price'])) {
+            if (is_int($columnsValues['total_price'])) {
+                $stmt->bindValue(':total_price', (int)$columnsValues['total_price'], PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':total_price', (float)$columnsValues['total_price'], PDO::PARAM_STR);
+            }
+        } else {
+            // Handle cases where total_price is not a valid number
+            throw new InvalidArgumentException("The total_price value must be a valid number.");
         }
 
         if (!$stmt->execute()) {
@@ -51,6 +53,7 @@ class Orders extends Model
         return true;
     }
 
+
     public function filterFillablesOrders(array $data)
     {
         foreach ($data as $key => $value) {
@@ -60,5 +63,15 @@ class Orders extends Model
         }
 
         return $data;
+    }
+
+    public function addOrderItem($itemData)
+    {
+        // SQL lekérdezés a rendelési tétel beszúrásához
+        // Példa:
+        $sql = "INSERT INTO order_items (order_id, product_id, quantity, price, total_price) VALUES (:order_id, :product_id, :quantity, :price, :total_price)";
+
+        // Készíts egy PDO-statement-et és bindold a paramétereket
+        // Végül végrehajtod a lekérdezést
     }
 }
