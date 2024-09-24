@@ -40,6 +40,7 @@ if (empty($userDataCart)) {
 }
 
 $dishesData = $dishes->getDishesById();
+$order_id = time() . '-' . $userId;
 
 //pd($dishesData);
 pd($userDataCart);
@@ -48,10 +49,10 @@ if (!empty($_POST)) {
     $errors = CartController::addToCart($_POST, $definitionDishes);
 }
 
-/*if (!empty($_POST) && isset($_POST['createOrder'])) {
+if (!empty($_POST) && isset($_POST['createOrder'])) {
 
     $errors = OrdersController::saveOrders($_POST, $definitionDishes);
-}*/
+}
 
 if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
     $cartItemId = (int)$_POST['id'];
@@ -188,10 +189,21 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Bezárás</button>
                                 <form action="" method="POST" class="cart-form">
-                                    <input type="hidden" name="cart_product_id" value="<?php echo $dish['id']; ?>" />
-                                    <input type="hidden" name="cart_user_id" value="<?php echo $userId; ?>" />
-                                    <input type="hidden" name="cart_quantity" value="<?php echo $userId; ?>" />
-                                    <input type="hidden" name="total_price" value="<?php echo htmlspecialchars($calculatedPrice, ENT_QUOTES, 'UTF-8'); ?>" />
+                                    <?php
+                                    $totalPrice = 0; // Inicializálás az összesített árhoz
+                                    foreach ($userDataCart as $order) :
+                                        $calculatedPrice = $order['cart_quantity'] * $order['cart_price'];
+                                        $totalPrice += $calculatedPrice; // Összeadjuk az árakat
+                                        $order_id = time() . '-' . $userId;
+                                    ?>
+                                        <input type="hidden" name="product_id[]" value="<?php echo $order['cart_product_id']; ?>" /> <!-- Tömböt használunk, hogy több termék ID-t is küldjünk -->
+                                        <input type="hidden" name="order_id" value="<?php echo $order_id; ?>" />
+                                        <input type="hidden" name="user_id" value="<?php echo $userId; ?>" />
+                                        <input type="hidden" name="quantity[]" value="<?php echo $order['cart_quantity']; ?>" /> <!-- Tömb a mennyiségekhez -->
+                                        <input type="hidden" name="price[]" value="<?php echo $order['cart_price']; ?>" /> <!-- Tömb az árakhoz -->
+                                    <?php endforeach; ?>
+                                    <input type="hidden" name="total_price" value="<?php echo htmlspecialchars($totalPrice, ENT_QUOTES, 'UTF-8'); ?>" /> <!-- Az összesített ár -->
+
                                     <div class="d-grid gap-2">
                                         <button class="btn btn-dark mt-2" name="createOrder" type="submit">Megrendelés</button>
                                     </div>
@@ -202,7 +214,7 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                 </div>
             </div>
 
-            <div class="d-flex justify-content-around p-2 m-2 flex-wrap"> 
+            <div class="d-flex justify-content-around p-2 m-2 flex-wrap">
                 <?php foreach ($dishesData as $dish) : ?>
                     <div class="card m-2" style="width: 18rem;">
                         <?php if (!empty($dish['dishes_image'])): ?>

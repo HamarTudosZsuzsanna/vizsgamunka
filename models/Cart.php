@@ -71,4 +71,11 @@ class Cart extends Model
         return $this -> delete($conditions);
     }
 
+    public function clearCartByUserId($userId) {
+        $query = "DELETE FROM cart_item WHERE cart_user_id = :cart_user_id";
+        $stmt = $this->connection->prepare($query);
+        $stmt->bindParam(':cart_user_id', $userId, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
 }

@@ -30,6 +30,28 @@ trait MetaData
         return $stmt->execute();
     }
 
+    public function createMetaOrders(array $columnsValues, int $userId)
+{
+    $queryString = "INSERT INTO orders_item (order_id, product_id, quantity, price)
+                    VALUES (:order_id, :product_id, :quantity, :price)
+                    ON DUPLICATE KEY UPDATE 
+                        quantity = :quantity, 
+                        price = :price;";
+
+    $stmt = $this->connection->prepare($queryString);
+
+    $params = [
+        ':order_id' => $columnsValues['order_id'], // <-- itt kell az order_id
+        ':product_id' => $columnsValues['product_id'],
+        ':quantity' => $columnsValues['quantity'],
+        ':price' => $columnsValues['price']
+    ];
+
+    return $stmt->execute($params);
+}
+
+
+
     public function slugify($string)
     {
         // Távolítsa el az ékezetes karaktereket

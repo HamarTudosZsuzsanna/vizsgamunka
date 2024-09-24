@@ -34,7 +34,7 @@ $loggedUser = $user->filterFillables($_SESSION['logged_in']);
 $userData = $user->getByUserId($userId);
 $userDataOrders = $user->getByUserOrder($userId);
 $loggedUserData = $user->filterFillablesData($userData);
-$loggedUserOrders = $order->filterFillablesOrders($userDataOrders);
+//$loggedUserOrders = $order->filterFillablesOrders($userDataOrders);
 
 
 //pd($loggedUser);

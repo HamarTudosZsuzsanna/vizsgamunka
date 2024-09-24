@@ -12,38 +12,36 @@ class Orders extends Model
         'id',
         'user_id',
         'total_price',
+        'order_status'
+    ];
+
+    protected array $fillablesOrdersItem = [
+        'order_id',
+        'product_id',
+        'quantity',
+        'price'
     ];
 
     public function createOrders(array $columnsValues, int $userId)
     {
-        $queryString = "INSERT INTO {$this->tableName} (user_id, total_price)
-                    VALUES (:user_id, :total_price)
+        $queryString = "INSERT INTO {$this->tableName} (user_id, total_price, order_status)
+                    VALUES (:user_id, :total_price, :order_status)
                     ON DUPLICATE KEY UPDATE 
                         user_id = :user_id,
-                        total_price = :total_price;
-                        ";
+                        total_price = :total_price,
+                        order_status = :order_status;";
 
         $stmt = $this->connection->prepare($queryString);
 
         $params = [
             ':user_id' => $userId,
             ':total_price' => $columnsValues['total_price'],
+            ':order_status' => $columnsValues['order_status'] ?? 'függőben', // Alapértelmezett érték
         ];
 
-        // Bind parameters with the correct type
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
-
-        // Check if total_price is numeric and bind appropriately
-        if (is_numeric($columnsValues['total_price'])) {
-            if (is_int($columnsValues['total_price'])) {
-                $stmt->bindValue(':total_price', (int)$columnsValues['total_price'], PDO::PARAM_INT);
-            } else {
-                $stmt->bindValue(':total_price', (float)$columnsValues['total_price'], PDO::PARAM_STR);
-            }
-        } else {
-            // Handle cases where total_price is not a valid number
-            throw new InvalidArgumentException("The total_price value must be a valid number.");
-        }
+        $stmt->bindValue(':total_price', $columnsValues['total_price'], PDO::PARAM_STR);
+        $stmt->bindValue(':order_status', $params[':order_status'], PDO::PARAM_STR); // Kösd be az order_status-t
 
         if (!$stmt->execute()) {
             error_log("SQL Error: " . implode(", ", $stmt->errorInfo()));
@@ -52,7 +50,6 @@ class Orders extends Model
 
         return true;
     }
-
 
     public function filterFillablesOrders(array $data)
     {
@@ -65,13 +62,18 @@ class Orders extends Model
         return $data;
     }
 
-    public function addOrderItem($itemData)
+    public function filterFillablesOrdersItem(array $data)
     {
-        // SQL lekérdezés a rendelési tétel beszúrásához
-        // Példa:
-        $sql = "INSERT INTO order_items (order_id, product_id, quantity, price, total_price) VALUES (:order_id, :product_id, :quantity, :price, :total_price)";
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $this->fillablesOrdersItem)) {
+                unset($data[$key]);
+            }
+        }
 
-        // Készíts egy PDO-statement-et és bindold a paramétereket
-        // Végül végrehajtod a lekérdezést
+        return $data;
     }
+
+    
+
+    
 }

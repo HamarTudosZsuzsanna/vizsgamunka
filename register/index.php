@@ -83,5 +83,3 @@ $errors = UserFormController::save($_POST, $definitions);
 
 
 </html>
-
-<?php
