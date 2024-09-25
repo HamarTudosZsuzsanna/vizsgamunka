@@ -80,6 +80,37 @@ class User extends Model
         return $this->readMeta(['*'], ['user_id' => $userId], 'users_meta');
     }
 
+    public function getByUserIdOrder($userId)
+    {
+        if (empty($userId)) {
+            return [];
+        }
+        // Az order_id-k beállítása az SQL lekérdezéshez
+        $placeholders = rtrim(str_repeat('?,', count($userId)), ',');
+        $queryString = "SELECT * FROM users_meta WHERE user_id IN ($placeholders)";
+
+        $stmt = $this->connection->prepare($queryString);
+        $stmt->execute($userId);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getById($userId)
+    {
+        
+        if (empty($userId)) {
+            return [];
+        }
+        // Az order_id-k beállítása az SQL lekérdezéshez
+        $placeholders = rtrim(str_repeat('?,', count($userId)), ',');
+        $queryString = "SELECT * FROM users WHERE id IN ($placeholders)";
+
+        $stmt = $this->connection->prepare($queryString);
+        $stmt->execute($userId);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getByUserOrder($userId)
     {
         return $this->readMeta(['*'], ['user_id' => $userId], 'orders');

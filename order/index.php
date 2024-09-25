@@ -43,7 +43,7 @@ $dishesData = $dishes->getDishesById();
 $order_id = time();
 
 //pd($dishesData);
-pd($userDataCart);
+//pd($userDataCart);
 
 if (!empty($_POST)) {
     $errors = CartController::addToCart($_POST, $definitionDishes);
@@ -61,9 +61,6 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
     redirect('/order');
     exit;
 }
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -140,6 +137,7 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
     <div>
         <div>
             <h3 class="text-center m-3 fw-bold">Termékek</h3>
+            <h5 class="text-center m-3 fst-italic">Rendelés leadásához <a href="/login/" class="text-decoration-none text-danger">jelentkezz be!</a></h5>
             <div class="text-center">
                 <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#cartModal">Kosár megnyitása</button>
                 <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">

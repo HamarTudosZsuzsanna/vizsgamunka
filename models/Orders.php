@@ -79,4 +79,12 @@ class Orders extends Model
 
         return $data;
     }
+
+    public function getOrdersById()
+    {
+
+        $result = $this->readMeta(['*'], [], 'orders');
+
+        return $result;
+    }
 }
