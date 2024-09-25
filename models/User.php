@@ -30,7 +30,7 @@ class User extends Model
         'password'
     ];
 
-     
+
     public function create(array $data): string|false
     {
         $data = parent::castValues($data);
@@ -85,6 +85,22 @@ class User extends Model
         return $this->readMeta(['*'], ['user_id' => $userId], 'orders');
     }
 
+    public function getByOrderItem(array $orderIds)
+    {
+        
+        if (empty($orderIds)) {
+            return [];
+        }
+        // Az order_id-k beállítása az SQL lekérdezéshez
+        $placeholders = rtrim(str_repeat('?,', count($orderIds)), ',');
+        $queryString = "SELECT * FROM orders_item WHERE order_id IN ($placeholders)";
+
+        $stmt = $this->connection->prepare($queryString);
+        $stmt->execute($orderIds);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getByUserOrderCart($userId)
     {
         return $this->readMeta(['*'], ['cart_user_id' => $userId], 'cart_item');
@@ -133,7 +149,4 @@ class User extends Model
 
         return $data;
     }
-
-
-
 }

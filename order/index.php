@@ -40,7 +40,7 @@ if (empty($userDataCart)) {
 }
 
 $dishesData = $dishes->getDishesById();
-$order_id = time() . '-' . $userId;
+$order_id = time();
 
 //pd($dishesData);
 pd($userDataCart);
@@ -194,7 +194,7 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                                     foreach ($userDataCart as $order) :
                                         $calculatedPrice = $order['cart_quantity'] * $order['cart_price'];
                                         $totalPrice += $calculatedPrice; // Összeadjuk az árakat
-                                        $order_id = time() . '-' . $userId;
+                                        $order_id = time();
                                     ?>
                                         <input type="hidden" name="product_id[]" value="<?php echo $order['cart_product_id']; ?>" /> <!-- Tömböt használunk, hogy több termék ID-t is küldjünk -->
                                         <input type="hidden" name="order_id" value="<?php echo $order_id; ?>" />

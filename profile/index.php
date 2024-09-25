@@ -3,10 +3,12 @@ require('../includes/init.php');
 require('../classes/UserFormController.php');
 require('../classes/OrdersController.php');
 require('../models/Orders.php');
+require_once('../models/Dishes.php');
 session_start();
 $errors = [];
 $user = new User();
 $order = new Orders();
+$dishes = new Dishes();
 $definitions = FormController::getDefinition('userUpdate');
 $definitionDatas = FormController::getDefinition('userData');
 
@@ -32,15 +34,20 @@ if (empty($_SESSION['logged_in']['id'])) {
 $userId = $_SESSION['logged_in']['id'];
 $loggedUser = $user->filterFillables($_SESSION['logged_in']);
 $userData = $user->getByUserId($userId);
-$userDataOrders = $user->getByUserOrder($userId);
 $loggedUserData = $user->filterFillablesData($userData);
-//$loggedUserOrders = $order->filterFillablesOrders($userDataOrders);
 
+$userDataOrders = $user->getByUserOrder($userId);
 
-//pd($loggedUser);
-//pd($userData);
-//pd($loggedUserData);
+$orderIds = [];
+foreach ($userDataOrders as $order) {
+    $orderIds[] = $order['order_id'];
+}
+
+$orderIdData = $user->getByOrderItem($orderIds);
+
 //pd($userDataOrders);
+//pd($orderIds);
+//pd($orderIdData);
 ?>
 
 <!DOCTYPE html>
@@ -198,22 +205,36 @@ $loggedUserData = $user->filterFillablesData($userData);
                                 <table class="m-3">
                                     <thead>
                                         <tr>
-                                            <th>Rendelés ID</th>
-                                            <th>Étel ID</th>
-                                            <th>Mennyiség</th>
-                                            <th>Ár</th>
+                                            <th>Rendelés összege</th>
+                                            <th>Rendelés állapota</th>
                                             <th>Dátum</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach ($userDataOrders as $order) : ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($order['order_id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                                <td><?php echo htmlspecialchars($order['dish_id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                                <td><?php echo htmlspecialchars($order['quantity'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                                <td><?php echo htmlspecialchars($order['price'], ENT_QUOTES, 'UTF-8'); ?> Ft</td>
-                                                <td><?php echo htmlspecialchars($order['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                                <td><?php echo htmlspecialchars($order['total_price'], ENT_QUOTES, 'UTF-8'); ?> Ft</td>
+                                                <td style="color: pink;"><?php echo htmlspecialchars($order['order_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                                <td><?php echo htmlspecialchars($order['order_date'], ENT_QUOTES, 'UTF-8'); ?></td>
                                             </tr>
+                                            <?php
+                                            $orderItems = $user->getByOrderItem([$order['order_id']]);
+                                            ?>
+                                            <?php if (!empty($orderItems)) : ?>
+                                                <tr>
+                                                    <td>
+                                                        <ul>
+                                                            <?php foreach ($orderItems as $item) : ?>
+                                                                <li>
+                                                                    <span class="fw-italic"><?php echo htmlspecialchars($dishes->getDishNameById($item['product_id']), ENT_QUOTES, 'UTF-8'); ?></span>
+
+                                                                    <span class="fst-italic"> | (Mennyiség: <?php echo htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8'); ?> db)</span>
+                                                                </li>
+                                                            <?php endforeach; ?>
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>

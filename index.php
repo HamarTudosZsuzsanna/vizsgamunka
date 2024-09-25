@@ -1,6 +1,6 @@
 <?php
 
-require('../vizsgamunka/includes/init.php');
+/*require('../vizsgamunka/includes/init.php');
 require('../vizsgamunka/classes/OrdersController.php');
 require_once('../vizsgamunka/models/Dishes.php');
 
@@ -12,7 +12,7 @@ $definitionDishes = FormController::getDefinition('dishes');
 $dishes = new Dishes();
 $dishesId = [];
 
-$dishesData = $dishes->getDishesById();
+$dishesData = $dishes->getDishesById();*/
 
 ?>
 
@@ -98,37 +98,7 @@ $dishesData = $dishes->getDishesById();
         <a href="/order/" class="btn btn-outline-dark rounded-0 px-3 py-2 btn-lg mt-3 mb-3" style="width: 200px;">Minden termék</a>
     </div>
 
-    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-        <div style="flex: 1; min-width: 250px;">
-            <h3>Termékek</h3>
-            <div>
-                <?php foreach ($dishesData as $dish) : ?>
-                    <div class="product">
-                        <strong>Termék neve:</strong> <?php echo htmlspecialchars($dish['dishes_name'], ENT_QUOTES, 'UTF-8'); ?><br>
-                        <strong>Leírás:</strong> <?php echo htmlspecialchars($dish['description'], ENT_QUOTES, 'UTF-8'); ?><br>
-                        <strong>Ár:</strong> <?php echo htmlspecialchars($dish['price'], ENT_QUOTES, 'UTF-8'); ?> Ft<br>
-                        <strong>Kategória:</strong> <?php echo htmlspecialchars($dish['categories'], ENT_QUOTES, 'UTF-8'); ?><br>
-                        <?php if (!empty($dish['dishes_image'])): ?>
-                            <strong>Kép:</strong> <img src="<?php echo htmlspecialchars($dish['dishes_image'], ENT_QUOTES, 'UTF-8'); ?>" alt="Dishes Image" style="max-width: 100px;"><br>
-                        <?php else: ?>
-                            <strong>Kép:</strong> Nincs kép<br>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    </div>
 
-    <section class="text-center py-5" id="gallery">
-        <h2 class="fw-bold">Lorem Ipsum</h2>
-        <?php foreach ($dishesData as $dish) : ?>
-            <div class="d-flex row-cols-2 g-2 pt-4">
-                <div class="col">
-                    <img src="<?php echo htmlspecialchars($dish['dishes_image'], ENT_QUOTES, 'UTF-8'); ?>" class="img-fluid" alt="" style="width: 200px; heigth: 200px;">
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </section>
 
 </body>
 

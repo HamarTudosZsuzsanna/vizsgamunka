@@ -14,11 +14,12 @@ class OrdersController extends FormController
 
     $order = new Orders();
     $userId = $_SESSION['logged_in']['id'];
-    $order_id = time() . '-' . $userId;
+    $order_id = time();
 
     $ordersData = [
         'id' => 'id',
         'user_id' => $userId,
+        'order_id' => $order_id,
         'total_price' => $data['total_price'],
         'order_status' => 'függőben',
     ];
