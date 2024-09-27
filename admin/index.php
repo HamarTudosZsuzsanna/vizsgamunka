@@ -10,7 +10,7 @@ $errors = UserFormController::loginAdmin($_POST, $definitions);
 
 
 if (!empty($_SESSION['logged_in'])) {
-    redirect('/admin/dishes');
+    redirect('/admin/orders');
 }
 
 ?>

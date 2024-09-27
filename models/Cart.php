@@ -19,7 +19,7 @@ class Cart extends Model
 
     public function createCart(array $columnsValues, int $userId)
     {
-        // A created_at mezőt már nem kell kezelnünk
+        
         $queryString = "INSERT INTO {$this->tableName} (cart_user_id, cart_product_id, cart_quantity, cart_price, total_price)
                     VALUES (:cart_user_id, :cart_product_id, :cart_quantity, :cart_price, :total_price)
                     ON DUPLICATE KEY UPDATE 

@@ -20,11 +20,28 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in']['role'] !== 'admin')
     redirect('/login');
 }
 
+if (isset($_POST['deleteOrder']) && isset($_POST['order_id'])) {
+    $orderItemId = (int)$_POST['order_id'];
+    $deleteSuccess = $orders->deleteOrder($orderItemId);
+    header('Location: /orders/?delete=' . ($deleteSuccess ? 'success' : 'error'));
+    redirect('/admin/orders');
+    exit;
+}
+
+if (isset($_POST['complete_order'])) {
+    $orderId = $_POST['order_id'];
+    $orders->updateOrderStatus($orderId, 'teljesítve');
+}
+
 $dishesData = $dishes->getDishesById(); //összes termék
 $ordersData = $orders->getOrdersById(); //rendelés alapadatok
 
 $userId = [];
 $orderIds = [];
+
+if (!is_array($ordersData[0])) {
+    $ordersData = [$ordersData];
+} 
 foreach ($ordersData as $order) {
     $orderIds[] = $order['order_id'];
     $userId[] = $order['user_id'];
@@ -53,6 +70,11 @@ $orderIdData = $user->getByOrderItem($orderIds); // rendelés részletei
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <title>Admin felület</title>
+    <script>
+        function confirmDelete() {
+            return confirm("Biztosan törölni szeretnéd ezt a terméket?");
+        };
+    </script>
     <style>
         .accordion-button {
             display: flex;
@@ -92,7 +114,7 @@ $orderIdData = $user->getByOrderItem($orderIds); // rendelés részletei
         <table class="m-3">
             <thead>
                 <tr class="text-center text-uppercase text-light">
-                    <th class="pb-2">Megrendelő neve </th>
+                    <th class="pb-2">Megrendelő Azonosítója </th>
                     <th class="pb-2">Teljes összeg</th>
                     <th class="pb-2">Rendelés állapota</th>
                     <th class="pb-2">rendelés dátuma</th>
@@ -100,10 +122,13 @@ $orderIdData = $user->getByOrderItem($orderIds); // rendelés részletei
             </thead>
             <tbody>
                 <?php foreach ($ordersData as $order) : ?>
-                    <tr class="text-center">
+                    <?php
+                    $rowClass = $order['order_status'] === 'teljesítve' ? 'bg-success' : 'bg-warning';
+                    ?>
+                    <tr class="text-center <?php echo $rowClass; ?> text-dark text-uppercase fw-bold">
                         <td><?php echo htmlspecialchars($order['user_id'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($order['total_price'], ENT_QUOTES, 'UTF-8'); ?></td>
-                        <td><?php echo htmlspecialchars($order['order_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                        <td><?php echo htmlspecialchars($order['total_price'], ENT_QUOTES, 'UTF-8'); ?> Ft</td>
+                        <td ><?php echo htmlspecialchars($order['order_status'], ENT_QUOTES, 'UTF-8'); ?></td>
                         <td><?php echo htmlspecialchars($order['order_date'], ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                     <?php
@@ -145,7 +170,7 @@ $orderIdData = $user->getByOrderItem($orderIds); // rendelés részletei
                         $customerDataItems = $user->getByUserIdOrder([$order['user_id']]);
                         ?>
                         <td>
-                        <?php if (!empty($customerDataItems)) : ?>
+                            <?php if (!empty($customerDataItems)) : ?>
                                 <ul>
                                     <?php foreach ($customerDataItems as $item) : ?>
                                         <li>
@@ -154,13 +179,20 @@ $orderIdData = $user->getByOrderItem($orderIds); // rendelés részletei
                                         <li>
                                             <span class="fst-italic"><?php echo htmlspecialchars($item['address'], ENT_QUOTES, 'UTF-8'); ?></span>
                                             <span class="fst-italic"><?php echo htmlspecialchars($item['number'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                        </li>  
+                                        </li>
                                     <?php endforeach; ?>
                                 </ul>
                             <?php endif; ?>
                         </td>
-                        <td class="text-center">
-                            <button class="btn bg-info btn-sm ">Teljesítve</button>
+                        <td class="text-center d-flex justify-content-center align-items-center">
+                            <form action="" method="POST" class="mt-3 me-2">
+                                <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order['order_id']) ?>">
+                                <input type="submit" name="complete_order" value="Rendelés teljesítve" class="btn btn-outline-dark btn-sm" />
+                            </form>
+                            <form action="" method="POST" onsubmit="return confirmDelete()" class="mt-3">
+                                <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($order['order_id']) ?>" />
+                                <input type="submit" name="deleteOrder" value="Rendelés törlése" class="btn btn-outline-danger btn-sm" />
+                            </form>
                         </td>
                     </tr>
 

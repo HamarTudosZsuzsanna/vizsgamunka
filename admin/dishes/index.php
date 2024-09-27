@@ -20,6 +20,7 @@ if (empty($_SESSION['logged_in']) || $_SESSION['logged_in']['role'] !== 'admin')
     redirect('/login');
 }
 
+
 $userId = $_SESSION['logged_in']['id'];
 $dishesData = $dishes->getDishesById();
 
@@ -40,6 +41,10 @@ if (isset($_SESSION['logged_in']['id']) && is_numeric($_SESSION['logged_in']['id
     exit;
 }
 
+if (!is_array($dishesData[0])) {
+    $dishesData = [$dishesData];
+}
+
 ?>
 
 
@@ -57,7 +62,7 @@ if (isset($_SESSION['logged_in']['id']) && is_numeric($_SESSION['logged_in']['id
             return confirm("Biztosan törölni szeretnéd ezt a terméket?");
         }
     </script>
-    <title>Termékek szerkesztése</title>
+    <title>Termékek</title>
 </head>
 
 <body>

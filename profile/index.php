@@ -4,7 +4,9 @@ require('../classes/UserFormController.php');
 require('../classes/OrdersController.php');
 require('../models/Orders.php');
 require_once('../models/Dishes.php');
+
 session_start();
+
 $errors = [];
 $user = new User();
 $order = new Orders();
@@ -37,6 +39,10 @@ $userData = $user->getByUserId($userId);
 $loggedUserData = $user->filterFillablesData($userData);
 
 $userDataOrders = $user->getByUserOrder($userId);
+
+if (!is_array($userDataOrders[0])) {
+    $userDataOrders = [$userDataOrders];
+}
 
 $orderIds = [];
 foreach ($userDataOrders as $order) {
@@ -107,7 +113,6 @@ $orderIdData = $user->getByOrderItem($orderIds);
                         <div class="card-body">
                             <div class="d-flex flex-column align-items-center text-center">
                                 <div class="mt-3">
-
                                     <h4><?php echo htmlspecialchars($loggedUser['last_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?> <?php echo htmlspecialchars($loggedUser['first_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?></h4>
                                     <p class="text-secondary mb-1">E-mail</p>
                                     <p class="text-muted font-size-sm"><?php echo htmlspecialchars($loggedUser['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?></p>
@@ -128,7 +133,6 @@ $orderIdData = $user->getByOrderItem($orderIds);
                             <input type="submit" class="btn btn-dark btn-lg" value="Kijelentkezés" />
                         </div>
                     </form>
-
                 </div>
                 <div class="col-md-8">
                     <div class="row col-sm">
@@ -137,6 +141,7 @@ $orderIdData = $user->getByOrderItem($orderIds);
                                 <form method="POST" class="card-body m-2">
                                     <input type="hidden" name="form_type" value="user" />
                                     <input type="hidden" name="id" value="<?php echo htmlspecialchars($loggedUser['id'], ENT_QUOTES, 'UTF-8'); ?>" />
+
                                     <?php foreach ($definitions as $definition) :
                                         if (in_array($definition['key'], ['password', 'password_repeat'])) {
                                             continue;
@@ -159,7 +164,6 @@ $orderIdData = $user->getByOrderItem($orderIds);
                                         <hr>
                                     <?php endforeach; ?>
 
-                                    <!-- Általános űrlaphiba megjelenítése -->
                                     <?php if (isset($errors['form_errors'])): ?>
                                         <div style="color: red;"><?php echo htmlspecialchars($errors['form_errors'], ENT_QUOTES, 'UTF-8'); ?></div>
                                     <?php endif; ?>
@@ -174,6 +178,7 @@ $orderIdData = $user->getByOrderItem($orderIds);
                             <div class="card h-100">
                                 <form method="POST" class="card-body m-2">
                                     <input type="hidden" name="form_type" value="user_data" />
+
                                     <?php foreach ($definitionDatas as $definitionData) : ?>
                                         <div class="row">
                                             <label class="col-sm-4"><?php echo htmlspecialchars($definitionData['label'], ENT_QUOTES, 'UTF-8'); ?></label>
@@ -188,6 +193,7 @@ $orderIdData = $user->getByOrderItem($orderIds);
                                         </div>
                                         <hr>
                                     <?php endforeach; ?>
+
                                     <?php if (isset($errors['form_errors'])): ?>
                                         <div style="color: red;"><?php echo htmlspecialchars($errors['form_errors'], ENT_QUOTES, 'UTF-8'); ?></div>
                                     <?php endif; ?>
@@ -199,6 +205,7 @@ $orderIdData = $user->getByOrderItem($orderIds);
                             </div>
                         </div>
                     </div>
+
                     <div class="row col-sm">
                         <div class="col-sm ">
                             <div class="card h-100 bg-secondary text-light">
@@ -211,10 +218,14 @@ $orderIdData = $user->getByOrderItem($orderIds);
                                         </tr>
                                     </thead>
                                     <tbody>
+
                                         <?php foreach ($userDataOrders as $order) : ?>
+                                            <?php
+                                            $rowClass = $order['order_status'] === 'teljesítve' ? 'color:yellow' : 'color: pink';
+                                            ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($order['total_price'], ENT_QUOTES, 'UTF-8'); ?> Ft</td>
-                                                <td style="color: pink;"><?php echo htmlspecialchars($order['order_status'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                                <td style="<?php echo $rowClass; ?>"><?php echo htmlspecialchars($order['order_status'], ENT_QUOTES, 'UTF-8'); ?></td>
                                                 <td><?php echo htmlspecialchars($order['order_date'], ENT_QUOTES, 'UTF-8'); ?></td>
                                             </tr>
                                             <?php
@@ -236,6 +247,7 @@ $orderIdData = $user->getByOrderItem($orderIds);
                                                 </tr>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
+
                                     </tbody>
                                 </table>
                             </div>

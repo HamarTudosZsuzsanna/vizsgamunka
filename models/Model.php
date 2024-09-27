@@ -99,7 +99,6 @@ class Model extends DatabaseManager
         return $conditionString;
     }
 
-
     protected function castValues(array $data): array
     {
         foreach ($this->casts as $key => $cast) {

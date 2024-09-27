@@ -24,27 +24,26 @@ class OrdersController extends FormController
         'order_status' => 'függőben',
     ];
 
-    // Az ordersMetaData így tartalmazni fogja az order_id-t is
+
     $ordersMetaData = [
-        'order_id' => $order_id, // Itt adjuk hozzá az order_id-t
-        'product_id' => $data['product_id'], // A termékek ID-jai
-        'quantity' => $data['quantity'], // Mennyiségek
-        'price' => $data['price'], // Árak
+        'order_id' => $order_id,
+        'product_id' => $data['product_id'],
+        'quantity' => $data['quantity'],
+        'price' => $data['price'],
     ];
 
     $orderId = $order->createOrders($ordersData, $userId);
-    
-    // A createMetaOrders metódushoz csak egyszer hívjuk meg a termékek tömbjét
+
     foreach ($ordersMetaData['product_id'] as $index => $productId) {
         $order->createMetaOrders([
-            'order_id' => $order_id, // Az order_id most már itt van
+            'order_id' => $order_id,
             'product_id' => $productId,
             'quantity' => $ordersMetaData['quantity'][$index],
             'price' => $ordersMetaData['price'][$index],
         ], $userId);
     }
 
-    $cart = new Cart();  // Feltételezve, hogy a Cart osztály kezelik a kosarat
+    $cart = new Cart();
     $cart->clearCartByUserId($userId);
 
     redirect('/profile');

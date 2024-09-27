@@ -83,8 +83,6 @@ class UserFormController extends FormController
 
         $updatedData = $user->getByUserId($userId);
 
-        //$_SESSION['logged_in'] = $updatedData;
-
         redirect('/profile');
     }
 

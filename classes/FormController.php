@@ -11,7 +11,6 @@ class FormController {
         return json_decode(file_get_contents($path), true);
     }
  
-   
     public static function getFieldValue(string|int $key): string|int {
         if (isset(self::$formData[$key])) {
             return self::$formData[$key];
@@ -51,7 +50,6 @@ class FormController {
                         foreach ($definition['rules'] as $rule) {
                             $isError = false;
     
-                            // Ellenőrizd, hogy a mező string-e, mielőtt a strlen() függvényt hívnád
                             $isStringField = is_string($fieldData);
     
                             switch($rule['type']) {

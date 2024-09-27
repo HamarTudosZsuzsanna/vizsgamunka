@@ -41,7 +41,7 @@ trait MetaData
     $stmt = $this->connection->prepare($queryString);
 
     $params = [
-        ':order_id' => $columnsValues['order_id'], // <-- itt kell az order_id
+        ':order_id' => $columnsValues['order_id'],
         ':product_id' => $columnsValues['product_id'],
         ':quantity' => $columnsValues['quantity'],
         ':price' => $columnsValues['price']
@@ -50,20 +50,15 @@ trait MetaData
     return $stmt->execute($params);
 }
 
-
-
     public function slugify($string)
     {
-        // Távolítsa el az ékezetes karaktereket
+
         $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
 
-        // Cserélje le a nem alfanumerikus karaktereket kötőjelekre
         $string = preg_replace('/[^A-Za-z0-9-]+/', '-', $string);
 
-        // Távolítsa el a kezdő és záró kötőjeleket
         $string = trim($string, '-');
 
-        // Kicsinybetűs formátumra alakítás
         $string = strtolower($string);
 
         return $string;

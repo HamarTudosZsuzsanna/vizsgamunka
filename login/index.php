@@ -1,5 +1,4 @@
 <?php
-
 require('../includes/init.php');
 require(CLASSES_DIR . '/UserFormController.php');
 
@@ -12,7 +11,6 @@ if (!empty($_SESSION['logged_in'])) {
     redirect('/profile');
 }
 
-
 ?>
 <!DOCTYPE html>
 
@@ -24,7 +22,6 @@ if (!empty($_SESSION['logged_in'])) {
     <title>Bejelentkezés</title>
 </head>
 
-
 <body>
     <section class="bg-light p-3 p-md-4 p-xl-5">
         <div class="container">
@@ -33,7 +30,7 @@ if (!empty($_SESSION['logged_in'])) {
                     <div class="card border-light-subtle shadow-sm">
                         <div class="row g-0">
                             <div class="col-12 col-md-6">
-                                <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" loading="lazy" src="../assets/img/ff.png" alt="">
+                                <img class="img-fluid rounded-start w-100 h-100 object-fit-cover" src="../assets/img/ff.png" alt="">
                             </div>
                             <div class="col-12 col-md-6 d-flex align-items-center justify-content-center">
                                 <div class="col-12 col-lg-11 col-xl-10">
@@ -46,7 +43,6 @@ if (!empty($_SESSION['logged_in'])) {
                                             </div>
                                         </div>
                                         <form method="POST">
-
                                             <div class="row gy-3 overflow-hidden">
                                                 <?php foreach ($definitions as $definition) : ?>
                                                     <div class="col-12">

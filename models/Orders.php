@@ -87,4 +87,35 @@ class Orders extends Model
 
         return $result;
     }
+
+    public function updateOrderStatus(string $orderId, string $orderStatus = 'függőben'): bool
+    {
+        $queryString = "UPDATE orders SET order_status = :order_status WHERE order_id = :order_id";
+
+        $params = [
+            ':order_status' => $orderStatus,
+            ':order_id' => $orderId
+        ];
+
+        $stmt = $this->connection->prepare($queryString);
+
+        foreach ($params as $param => $value) {
+            $stmt->bindValue($param, $value, PDO::PARAM_STR);
+        }
+
+        if (!$stmt->execute()) {
+            error_log("SQL Error: " . implode(", ", $stmt->errorInfo()));
+            return false;
+        }
+
+        return true;
+    }
+
+    public function deleteOrder($orderId)
+    {
+        $conditions = [
+            'order_id' => $orderId
+        ];
+        return $this->delete($conditions);
+    }
 }

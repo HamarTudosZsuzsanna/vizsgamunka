@@ -122,10 +122,6 @@ class Dishes extends Model
 
         $result = $this->readMeta(['*'], ['dishes_image' => $dishesImage], 'dishes');
 
-        /*if (empty($result) || !array_key_exists('meta_value', $result)) {
-            return '';
-        }*/
-
         return $result['dishes_image'];
     }
 

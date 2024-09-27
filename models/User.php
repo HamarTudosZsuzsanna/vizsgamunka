@@ -85,7 +85,7 @@ class User extends Model
         if (empty($userId)) {
             return [];
         }
-        // Az order_id-k beállítása az SQL lekérdezéshez
+
         $placeholders = rtrim(str_repeat('?,', count($userId)), ',');
         $queryString = "SELECT * FROM users_meta WHERE user_id IN ($placeholders)";
 
@@ -101,7 +101,7 @@ class User extends Model
         if (empty($userId)) {
             return [];
         }
-        // Az order_id-k beállítása az SQL lekérdezéshez
+
         $placeholders = rtrim(str_repeat('?,', count($userId)), ',');
         $queryString = "SELECT * FROM users WHERE id IN ($placeholders)";
 
@@ -122,7 +122,7 @@ class User extends Model
         if (empty($orderIds)) {
             return [];
         }
-        // Az order_id-k beállítása az SQL lekérdezéshez
+
         $placeholders = rtrim(str_repeat('?,', count($orderIds)), ',');
         $queryString = "SELECT * FROM orders_item WHERE order_id IN ($placeholders)";
 

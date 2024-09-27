@@ -67,20 +67,18 @@ class DishesFormController extends FormController
             $errors['form_errors'] = 'Minden mezőt ki kell tölteni!';
             return $errors;
         }
-        // Adatok validálása
+
         $errors = parent::validate($data, $definitions);
 
         if (!empty($errors)) {
             return $errors;
         }
 
-        // Felhasználói azonosító ellenőrzése
         if (!isset($_SESSION['logged_in']['id']) || !is_numeric($_SESSION['logged_in']['id']) || (int)$_SESSION['logged_in']['id'] <= 0) {
             $errors['form_errors'] = 'Hibás felhasználói azonosító.';
             return $errors;
         }
 
-        // Az étel slug alapján történő lekérése
         $dishesSlug = $_GET['id'];
         $dishes = new Dishes();
         $existingDishesData = $dishes->getDishesBySlug($dishesSlug);
@@ -90,7 +88,6 @@ class DishesFormController extends FormController
             return $errors;
         }
 
-        // Alapvető adatfeldolgozás
         $adminId = (int)$_SESSION['logged_in']['id'];
         $slug = $dishes->slugify($data['dishes_name']);
 
@@ -109,7 +106,6 @@ class DishesFormController extends FormController
             'admin_id' => $adminId
         ];
 
-        // Kép feltöltésének ellenőrzése
         if (isset($_FILES['dishes_image']) && $_FILES['dishes_image']['error'] === UPLOAD_ERR_OK) {
             $dishesImage = $_FILES['dishes_image'];
             $fileName = uniqid() . '.png';
@@ -124,11 +120,10 @@ class DishesFormController extends FormController
                 return $errors;
             }
         } else {
-            // Ha nincs új kép feltöltve, használjuk a meglévő képet
+
             $dishesData['dishes_image'] = $existingDishesData['dishes_image'];
         }
 
-        // Adatok frissítése az adatbázisban
         $result = $dishes->updateDishes($dishesData, $dishesSlug);
 
         if (!$result) {
@@ -136,7 +131,6 @@ class DishesFormController extends FormController
             return $errors;
         }
 
-        // Sikeres frissítés után visszairányítás
         redirect('/admin/dishes');
     }
 }

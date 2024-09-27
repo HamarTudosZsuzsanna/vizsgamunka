@@ -36,8 +36,8 @@ $errors = UserFormController::save($_POST, $definitions);
                                             </div>
                                         </div>
                                         <form method="POST">
-
                                             <div class="row gy-3 overflow-hidden">
+
                                                 <?php foreach ($definitions as $definition) : ?>
                                                     <div class="col-12">
                                                         <div class="form-floating mb-1">
@@ -46,9 +46,11 @@ $errors = UserFormController::save($_POST, $definitions);
                                                         </div>
                                                     </div>
                                                 <?php endforeach; ?>
+
                                                 <?php if (is_array($errors) && array_key_exists('form_errors', $errors)): ?>
                                                     <div style="color: red;"><?php echo $errors['form_errors']; ?></div>
                                                 <?php endif; ?>
+                                                
                                                 <div class="column">
                                                     <input type="checkbox" id="accepted" name="accepted" value="accepted">
                                                     <label for="accepted">Elfogadom a felhasználási feltételeket</label>

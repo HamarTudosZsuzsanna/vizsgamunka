@@ -41,9 +41,10 @@ if (empty($userDataCart)) {
 
 $dishesData = $dishes->getDishesById();
 $order_id = time();
+$userId = $_SESSION['logged_in']['id'];
 
 //pd($dishesData);
-//pd($userDataCart);
+//pd($_SESSION['logged_in']);
 
 if (!empty($_POST)) {
     $errors = CartController::addToCart($_POST, $definitionDishes);
@@ -83,14 +84,12 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
         .fontsize {
             font-size: 24px;
         }
-
         body {
             background-image: url('/assets/img/order-bcg.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
-
         .product-img {
             width: 250px;
             height: 250px;
@@ -137,7 +136,14 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
     <div>
         <div>
             <h3 class="text-center m-3 fw-bold">Termékek</h3>
-            <h5 class="text-center m-3 fst-italic">Rendelés leadásához <a href="/login/" class="text-decoration-none text-danger">jelentkezz be!</a></h5>
+            <?php
+            if (isset($_SESSION['logged_in']) && isset($_SESSION['logged_in']['first_name'])) {
+                $customerName = 'Üdvözlünk ' . htmlspecialchars($_SESSION['logged_in']['first_name'], ENT_QUOTES, 'UTF-8') . '!';
+            } else {
+                $customerName = 'Rendelés leadásához <a href="/login/" class="text-decoration-none text-danger">jelentkezz be!</a>';
+            }
+            ?>
+            <h5 class="text-center m-3 fst-italic"><?php echo ($customerName); ?></h5>
             <div class="text-center">
                 <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#cartModal">Kosár megnyitása</button>
                 <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
@@ -188,19 +194,19 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                                 <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">Bezárás</button>
                                 <form action="" method="POST" class="cart-form">
                                     <?php
-                                    $totalPrice = 0; // Inicializálás az összesített árhoz
+                                    $totalPrice = 0;
                                     foreach ($userDataCart as $order) :
                                         $calculatedPrice = $order['cart_quantity'] * $order['cart_price'];
-                                        $totalPrice += $calculatedPrice; // Összeadjuk az árakat
+                                        $totalPrice += $calculatedPrice;
                                         $order_id = time();
                                     ?>
-                                        <input type="hidden" name="product_id[]" value="<?php echo $order['cart_product_id']; ?>" /> <!-- Tömböt használunk, hogy több termék ID-t is küldjünk -->
+                                        <input type="hidden" name="product_id[]" value="<?php echo $order['cart_product_id']; ?>" />
                                         <input type="hidden" name="order_id" value="<?php echo $order_id; ?>" />
                                         <input type="hidden" name="user_id" value="<?php echo $userId; ?>" />
-                                        <input type="hidden" name="quantity[]" value="<?php echo $order['cart_quantity']; ?>" /> <!-- Tömb a mennyiségekhez -->
-                                        <input type="hidden" name="price[]" value="<?php echo $order['cart_price']; ?>" /> <!-- Tömb az árakhoz -->
+                                        <input type="hidden" name="quantity[]" value="<?php echo $order['cart_quantity']; ?>" />
+                                        <input type="hidden" name="price[]" value="<?php echo $order['cart_price']; ?>" />
                                     <?php endforeach; ?>
-                                    <input type="hidden" name="total_price" value="<?php echo htmlspecialchars($totalPrice, ENT_QUOTES, 'UTF-8'); ?>" /> <!-- Az összesített ár -->
+                                    <input type="hidden" name="total_price" value="<?php echo htmlspecialchars($totalPrice, ENT_QUOTES, 'UTF-8'); ?>" />
 
                                     <div class="d-grid gap-2">
                                         <button class="btn btn-dark mt-2" name="createOrder" type="submit">Megrendelés</button>
@@ -239,6 +245,7 @@ if (isset($_POST['deleteItem']) && isset($_POST['id'])) {
                     </div>
                 <?php endforeach; ?>
             </div>
+            
         </div>
 
     </div>
