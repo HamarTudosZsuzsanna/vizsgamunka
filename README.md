@@ -1,3 +1,3 @@
-# vizsgamunka
+# vizsgamunka - PHP
 # vizsgamunka
 # vizsgamunka
